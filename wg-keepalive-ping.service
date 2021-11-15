@@ -3,7 +3,7 @@ Description=Wireguard Ping Peer ${IP} each ${INTERVAL} to Keep Alive. Use system
 After=wg-quick@wg0.service
 
 [Service]
-ExecStart=/usr/bin/ping ${IP} -i ${INTERVAL}
+ExecStart=/bin/ping ${IP} -i ${INTERVAL}
 
 [Install]
 WantedBy=multi-user.target
