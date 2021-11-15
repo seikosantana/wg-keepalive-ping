@@ -23,7 +23,7 @@ According to my inspections so far after tinkering with these for 3 weeks, clien
 - A traffic from the client is routed to the server which doesn't seem to happen after the kill-switch (to allow only VPN connections through the tunnel) is turned of by changing AllowedIPs.
 - A ping to reach any host in the AllowedIPs is performed.
 
-That should explain what the service does.
+That should explain the workaround the service does.
 
 ##### Is this service required for Wireguard installations?
 I don't think so. Wireguard peers seems to reconnect after some period of time if everything is tunneled through the VPN, which is _probably_ because network activities makes the host to reach the VPN peers.  
@@ -32,10 +32,31 @@ This might not be necessary unless you are facing disconnections like in my case
 I'm no expert but discussions are welcome. May this simple service help you.
 
 ## How to use?
-- Download the `wg-keepalive-ping.service` and install it into the systemd
-- Set the IP and the ping interval with
+Download the `wg-keepalive-ping.service` and install it into the systemd
+```bash
+wget https://raw.githubusercontent.com/seikosantana/wg-keepalive-ping/master/wg-keepalive-ping.service
+sudo cp wg-keepalive-ping.service /etc/systemd/system/
+```
+Set the IP and the ping interval with
 ```bash
 $ sudo systemctl edit wg-keepalive-ping
 ```
-- Add the variables like in the `sample-env-override-conf` in the file `systemctl` created for you.
-- Reload the daemon and restart the service.
+_Required_:
+Add the environment variables of `IP` and `INTERVAL` as in the [example](https://github.com/seikosantana/wg-keepalive-ping/blob/master/sample-env-override.conf).
+Put them in the file `systemctl` created for you.
+```
+[Service]
+Environment="IP=10.66.66.1" #Any IP to ping, in this case the Wireguard peer
+Environment="INTERVAL=15" #The ping interval.
+```
+Save the file and close the text editor.
+Reload the daemon and restart the service.
+```bash
+$ sudo systemctl daemon-reload
+$ sudo systemctl enable --now wg-keepalive-ping.service
+```
+
+To edit the variables again, use `systemctl edit wg-keepalive-ping` and run `systemctl daemon-reload`.
+
+
+Any questions and suggestions are welcome :)
